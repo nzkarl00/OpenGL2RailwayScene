@@ -16,3 +16,5 @@ void wagon();
 void loadTracks();
 
 void tunnel();
+
+void stationFloor();

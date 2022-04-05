@@ -14,14 +14,19 @@
 #include <iostream>
 #include <fstream>
 
+const int pillarPTS = 62;
+float vasex_init[pillarPTS];
+float vasey_init[pillarPTS]
 const int NPTS = 494;
 float ptx[NPTS], ptz[NPTS];
-float tunnelx[16] = {0.3682142857142858,0.5813492063492063,0.9392857142857143,1.5331349206349205,2.3140873015873007,
-3.1438492063492056,3.9736111111111105,4.8033730158730155,5.6331349206349195,6.462896825396824,
-7.2926587301587285,8.122420634920635,8.830158730158729,9.310119047619047,9.59484126984127,9.734761904761905};
-float tunnely[16] = {0.5669032450904279, 1.519636890262944, 2.268871703637423, 3.0235340435593385, 3.663359552177626, 4.093266827060598,
- 4.343352088821288, 4.447894816536321, 4.4154648799748495, 4.245190766956961, 3.9180444615545302, 3.384204517482466, 2.6806738893796234,
- 1.9312466371140031, 1.1592791116821473, 0.4096262837156601};
+float vx[24] = {40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,
+24,23,22,21,20,19,18,17};
+float vy[24] = { 2.4204, 4.6608, 6.8448, 8.9119,10.958, 13.018, 14.899, 16.347, 17.391, 18.120,
+18.576, 18.772, 18.725, 18.424, 17.869, 17.029, 15.835, 14.199, 12.204, 10.166, 8.0851,
+5.9946, 3.6660, 1.9660};
+float vz[24] = {30.734,30.875,31.158,31.584,32.188,33.028,34.071,35.175,36.281,37.390,38.500,
+39.611,40.724,41.838,42.954,44.071,45.190,46.312,47.318,48.087,48.656,
+49.046,49.292,49.402};
 //--------------- GROUND PLANE ------------------------------------
 // This is a square shaped region on the xz-plane of size 400x400 units
 // centered at the origin.  This region is constructed using small quads
@@ -50,6 +55,78 @@ void floor()
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
 
 }
+
+void stationFloor()
+{
+    glColor4f(0,0.7,0,1);
+    glNormal3f(0.0, 1.0, 0.0);
+    glBegin(GL_QUADS);
+    //Station floor
+    for(int i = -50; i < -10; i++)
+    {
+        for(int j = -70;  j < -50; j++)
+        {
+            glVertex3f(i, 3, j);
+            glVertex3f(i, 3, j+1);
+            glVertex3f(i+1, 3, j+1);
+            glVertex3f(i+1, 3, j);
+        }
+    }
+    glEnd();
+    glBegin(GL_QUADS);
+    //Station floor side
+    glNormal3f(-1, 0, 0.0);
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = -70;  j < -50; j++)
+        {
+            glVertex3f(-50, i, j);
+            glVertex3f(-50, i, j+1);
+            glVertex3f(-50, i+1, j+1);
+            glVertex3f(-50, i+1, j);
+        }
+    }
+    glBegin(GL_QUADS);
+    //Station floor side
+    glNormal3f(1, 0, 0.0);
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = -70;  j < -50; j++)
+        {
+            glVertex3f(-10, i, j);
+            glVertex3f(-10, i, j+1);
+            glVertex3f(-10, i+1, j+1);
+            glVertex3f(-10, i+1, j);
+        }
+    }
+    glBegin(GL_QUADS);
+    //Station floor side
+    glNormal3f(0, 0, 1.0);
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = -50;  j < -10; j++)
+        {
+            glVertex3f(j, i, -50);
+            glVertex3f(j+1, i, -50);
+            glVertex3f(j+1, i+1, -50);
+            glVertex3f(j, i+1, -50);
+        }
+    }
+    glBegin(GL_QUADS);
+    //Station floor side
+    glNormal3f(0, 0, -1.0);
+    for(int i = 0; i < 3; i++)
+    {
+        for(int j = -50;  j < -10; j++)
+        {
+            glVertex3f(j, i, -70);
+            glVertex3f(j+1, i, -70);
+            glVertex3f(j+1, i+1, -70);
+            glVertex3f(j, i+1, -70);
+        }
+    }
+}
+
 
 //--------------- RAILWAY TRACK ------------------------------------
 // A circular railway track of specified median radius and width
@@ -88,7 +165,7 @@ void tracks()
         }
         for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
         {
-            std::cout << ptx[i] << std::endl;
+            //std::cout << ptx[i] << std::endl;
             glm::vec3 p(ptx[i], 0, ptz[i]);
             glm::vec3 u(ptx[i + 1] - ptx[i], 0, ptz[i + 1] - ptz[i]);
             u = glm::normalize(u);
@@ -100,7 +177,7 @@ void tracks()
         }
         for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
         {
-            std::cout << ptx[i] << std::endl;
+            //std::cout << ptx[i] << std::endl;
             glm::vec3 p(ptx[i], 0, ptz[i]);
             glm::vec3 u(ptx[i + 1] - ptx[i], 0, ptz[i + 1] - ptz[i]);
             u = glm::normalize(u);
@@ -118,17 +195,97 @@ void tracks()
 
 
 void tunnel() {
-        glColor4f(0.0, 0.0, 0.3, 1.0);
-
-        for (int slice = 0; slice < 32; slice++) {
-            glBegin(GL_QUAD_STRIP);
-            for (int i = 0; i < 16; i++)
-            {
-                glVertex3f(25-slice, tunnely[i]*5 - 8, tunnelx[i]*4 + 20);
-                glVertex3f(26-slice, tunnely[i]*5 - 8, tunnelx[i]*4 + 20);
-            }
-            glEnd();
-        };
+    glColor4f(0.0, 0.0, 0.3, 1.0);
+    glBegin(GL_QUAD_STRIP);
+    //Archway back cover
+    for (int i = 0; i < 24; i++)
+    {
+        glVertex3f(40, vy[i]/2 + 10, vz[i]);
+        glVertex3f(40, (vy[i]/2 + 10)*.9, ((vz[i]-40)*.9)+40);
+    }
+    glEnd();
+    glBegin(GL_QUAD_STRIP);
+    //Archway front cover
+    for (int i = 0; i < 24; i++)
+    {
+        glVertex3f(8, vy[i]/2 + 10, vz[i]);
+        glVertex3f(8, (vy[i]/2 + 10)*.9, ((vz[i]-40)*.9)+40);
+    }
+    glEnd();
+    glBegin(GL_QUAD_STRIP);
+    //Pillar back near cover
+    glVertex3f(40, (vy[0]/2 + 10)*.9, ((vz[0]-40)*.9)+40);
+    glVertex3f(40, vy[0]/2 + 10, vz[0]);
+    glVertex3f(40, 0, ((vz[0]-40)*.9)+40);
+    glVertex3f(40, 0, vz[0]);
+    glEnd();
+    glBegin(GL_QUAD_STRIP);
+    //Pillar back far cover
+    glVertex3f(40, (vy[23]/2 + 10)*.9, ((vz[23]-40)*.9)+40);
+    glVertex3f(40, vy[23]/2 + 10, vz[23]);
+    glVertex3f(40, 0, ((vz[23]-40)*.9)+40);
+    glVertex3f(40, 0, vz[23]);
+    glEnd();
+    glBegin(GL_QUAD_STRIP);
+    //Pillar front near cover
+    glVertex3f(8, (vy[0]/2 + 10)*.9, ((vz[0]-40)*.9)+40);
+    glVertex3f(8, vy[0]/2 + 10, vz[0]);
+    glVertex3f(8, 0, ((vz[0]-40)*.9)+40);
+    glVertex3f(8, 0, vz[0]);
+    glEnd();
+    glBegin(GL_QUAD_STRIP);
+    //Pillar front far cover
+    glVertex3f(8, (vy[23]/2 + 10)*.9, ((vz[23]-40)*.9)+40);
+    glVertex3f(8, vy[23]/2 + 10, vz[23]);
+    glVertex3f(8, 0, ((vz[23]-40)*.9)+40);
+    glVertex3f(8, 0, vz[23]);
+    glEnd();
+    for (int slice = 0; slice < 32; slice++) {
+        glBegin(GL_QUAD_STRIP);
+        //Outer arch
+        for (int i = 0; i < 24; i++)
+        {
+            glVertex3f(40-slice, vy[i]/2 + 10, vz[i]);
+            glVertex3f(39-slice, vy[i]/2 + 10, vz[i]);
+        }
+        glEnd();
+        glBegin(GL_QUAD_STRIP);
+        //Inner arch
+        for (int i = 0; i < 24; i++)
+        {
+            glVertex3f(40-slice, (vy[i]/2 + 10)*.9, ((vz[i]-40)*.9)+40);
+            glVertex3f(39-slice, (vy[i]/2 + 10)*.9, ((vz[i]-40)*.9)+40);
+        }
+        glEnd();
+        glBegin(GL_QUAD_STRIP);
+        //Near pillar inner
+        glVertex3f(40-slice, (vy[0]/2 + 10)*.9, ((vz[0]-40)*.9)+40);
+        glVertex3f(39-slice, (vy[0]/2 + 10)*.9, ((vz[0]-40)*.9)+40);
+        glVertex3f(40-slice, 0, ((vz[0]-40)*.9)+40);
+        glVertex3f(39-slice, 0, ((vz[0]-40)*.9)+40);
+        glEnd();
+        glBegin(GL_QUAD_STRIP);
+        //Near pillar outer
+        glVertex3f(40-slice, vy[0]/2 + 10, vz[0]);
+        glVertex3f(39-slice, vy[0]/2 + 10, vz[0]);
+        glVertex3f(40-slice, 0, vz[0]);
+        glVertex3f(39-slice, 0, vz[0]);
+        glEnd();
+        glBegin(GL_QUAD_STRIP);
+        //Far pillar outer
+        glVertex3f(40-slice, vy[23]/2 + 10, vz[23]);
+        glVertex3f(39-slice, vy[23]/2 + 10, vz[23]);
+        glVertex3f(40-slice, 0, vz[23]);
+        glVertex3f(39-slice, 0, vz[23]);
+        glEnd();
+        glBegin(GL_QUAD_STRIP);
+        //Far pillar inner
+        glVertex3f(40-slice, (vy[23]/2 + 10)*.9, ((vz[23]-40)*.9)+40);
+        glVertex3f(39-slice, (vy[23]/2 + 10)*.9, ((vz[23]-40)*.9)+40);
+        glVertex3f(40-slice, 0, ((vz[23]-40)*.9)+40);
+        glVertex3f(39-slice, 0, ((vz[23]-40)*.9)+40);
+        glEnd();
+    };
 
 }
 

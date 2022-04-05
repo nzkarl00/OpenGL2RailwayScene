@@ -19,13 +19,13 @@ void special(int key, int x, int y)
     else if(key == GLUT_KEY_RIGHT) angle += 0.1;
     else if(key == GLUT_KEY_DOWN)
     {  //Move backward
-        eye_x -= 0.1*sin(angle);
-        eye_z += 0.1*cos(angle);
+        eye_x -= 1*sin(angle);
+        eye_z += 1*cos(angle);
     }
     else if(key == GLUT_KEY_UP)
     { //Move forward
-        eye_x += 0.1*sin(angle);
-        eye_z -= 0.1*cos(angle);
+        eye_x += 1*sin(angle);
+        eye_z -= 1*cos(angle);
     }
     else if(key == GLUT_KEY_PAGE_UP)
     {
@@ -87,6 +87,7 @@ void display(void)
    gluLookAt (eye_x, cam_hgt, eye_z,  look_x, 0, look_z,   0, 1, 0);
    glLightfv(GL_LIGHT0, GL_POSITION, lgt_pos);   //light position
    floor();
+   stationFloor();
    tunnel();
    tracks();  //mean radius 120 units, width 10 units
    glPushMatrix();
