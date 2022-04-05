@@ -14,9 +14,14 @@
 #include <iostream>
 #include <fstream>
 
-const int NPTS = 492;
+const int NPTS = 494;
 float ptx[NPTS], ptz[NPTS];
-
+float tunnelx[16] = {0.3682142857142858,0.5813492063492063,0.9392857142857143,1.5331349206349205,2.3140873015873007,
+3.1438492063492056,3.9736111111111105,4.8033730158730155,5.6331349206349195,6.462896825396824,
+7.2926587301587285,8.122420634920635,8.830158730158729,9.310119047619047,9.59484126984127,9.734761904761905};
+float tunnely[16] = {0.5669032450904279, 1.519636890262944, 2.268871703637423, 3.0235340435593385, 3.663359552177626, 4.093266827060598,
+ 4.343352088821288, 4.447894816536321, 4.4154648799748495, 4.245190766956961, 3.9180444615545302, 3.384204517482466, 2.6806738893796234,
+ 1.9312466371140031, 1.1592791116821473, 0.4096262837156601};
 //--------------- GROUND PLANE ------------------------------------
 // This is a square shaped region on the xz-plane of size 400x400 units
 // centered at the origin.  This region is constructed using small quads
@@ -68,19 +73,63 @@ void tracks()
     float w1 = 3.5; float w2 = 4;
     glColor4f(0.0, 0.0, 0.3, 1.0);
     glBegin(GL_QUAD_STRIP);
-		for (int i = 0; i < 360; i += 5)    //5 deg intervals
-		{
-            std::cout << ptx[i] << std::endl;
-            glm::vec3 p (ptx[i], 0, ptz[i]);
-            glm::vec3 u (ptx[i+1]-ptx[i], 0, ptz[i+1] - ptz[i]);
+    for (int i=0; i < 2; i++) {
+        for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
+        {
+            //std::cout << ptx[i] << std::endl;
+            glm::vec3 p(ptx[i], 0, ptz[i]);
+            glm::vec3 u(ptx[i + 1] - ptx[i], 0, ptz[i + 1] - ptz[i]);
             u = glm::normalize(u);
             glm::vec3 v = {u[2], u[1], -u[0]};
-            glm::vec3 t1(p + v*w1);
-            glm::vec3 t2(p + v*w2);
+            glm::vec3 t1(p + v * w1);
+            glm::vec3 t2(p + v * w2);
+            glVertex3f(t1[0], 0.5, t1[2]);
+            glVertex3f(t2[0], 0.5, t2[2]);
+        }
+        for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
+        {
+            std::cout << ptx[i] << std::endl;
+            glm::vec3 p(ptx[i], 0, ptz[i]);
+            glm::vec3 u(ptx[i + 1] - ptx[i], 0, ptz[i + 1] - ptz[i]);
+            u = glm::normalize(u);
+            glm::vec3 v = {u[2], u[1], -u[0]};
+            glm::vec3 t1(p + v * w1);
+            glm::vec3 t2(p + v * w2);
             glVertex3f(t1[0], t1[1], t1[2]);
+            glVertex3f(t1[0], 0.5, t1[2]);
+        }
+        for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
+        {
+            std::cout << ptx[i] << std::endl;
+            glm::vec3 p(ptx[i], 0, ptz[i]);
+            glm::vec3 u(ptx[i + 1] - ptx[i], 0, ptz[i + 1] - ptz[i]);
+            u = glm::normalize(u);
+            glm::vec3 v = {u[2], u[1], -u[0]};
+            glm::vec3 t1(p + v * w1);
+            glm::vec3 t2(p + v * w2);
             glVertex3f(t2[0], t2[1], t2[2]);
-	}
+            glVertex3f(t2[0], 0.5, t2[2]);
+        }
+        w1 = -w1;
+        w2 = -w2;
+    }
 	glEnd();
+}
+
+
+void tunnel() {
+        glColor4f(0.0, 0.0, 0.3, 1.0);
+
+        for (int slice = 0; slice < 32; slice++) {
+            glBegin(GL_QUAD_STRIP);
+            for (int i = 0; i < 16; i++)
+            {
+                glVertex3f(25-slice, tunnely[i]*5 - 8, tunnelx[i]*4 + 20);
+                glVertex3f(26-slice, tunnely[i]*5 - 8, tunnelx[i]*4 + 20);
+            }
+            glEnd();
+        };
+
 }
 
 //--------------- MODEL BASE --------------------------------------

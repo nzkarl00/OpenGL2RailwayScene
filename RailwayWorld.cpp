@@ -87,6 +87,7 @@ void display(void)
    gluLookAt (eye_x, cam_hgt, eye_z,  look_x, 0, look_z,   0, 1, 0);
    glLightfv(GL_LIGHT0, GL_POSITION, lgt_pos);   //light position
    floor();
+   tunnel();
    tracks();  //mean radius 120 units, width 10 units
    glPushMatrix();
    glRotatef(r, 0, 1, 0);

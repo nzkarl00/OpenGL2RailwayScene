@@ -14,3 +14,5 @@ void engine();
 void wagon();
 
 void loadTracks();
+
+void tunnel();
