@@ -17,4 +17,12 @@ void loadTracks();
 
 void tunnel();
 
-void stationFloor();
+void station();
+
+void stationFloor(int height);
+
+void loadPillar();
+
+void pillar(int x, int y, int z);
+
+void stationRoof();

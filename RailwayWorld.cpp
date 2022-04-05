@@ -51,6 +51,7 @@ void initialize(void)
 	glEnable(GL_LIGHT0);
     glEnable(GL_LIGHT1);
     loadTracks();
+    loadPillar();
 //	Define light's ambient, diffuse, specular properties
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
@@ -87,7 +88,7 @@ void display(void)
    gluLookAt (eye_x, cam_hgt, eye_z,  look_x, 0, look_z,   0, 1, 0);
    glLightfv(GL_LIGHT0, GL_POSITION, lgt_pos);   //light position
    floor();
-   stationFloor();
+   station();
    tunnel();
    tracks();  //mean radius 120 units, width 10 units
    glPushMatrix();

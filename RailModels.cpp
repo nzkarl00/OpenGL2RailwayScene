@@ -14,9 +14,15 @@
 #include <iostream>
 #include <fstream>
 
-const int pillarPTS = 62;
-float vasex_init[pillarPTS];
-float vasey_init[pillarPTS]
+const int pillarPTS = 50;
+float pillarx_init[pillarPTS] = { 0, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+                     5, 5, 5.6, 5.7, 5.8, 6, 6, 4, 2, 0 };
+float pillary_init[pillarPTS] = { 0, 0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3, 3.2, 3.4, 3.6,
+                     3.8, 4, 4.2, 4.4, 4.6, 4.8, 5, 5.2, 5.4, 5.6, 5.8, 6, 6.2, 6.4, 6.6, 6.8, 7, 7.2, 7.4, 7.6,
+                     7.8, 8, 8.2, 8.4, 8.6, 8.8, 9, 9, 9, 9 };
+float pnormx_init[pillarPTS];
+float pnormy_init[pillarPTS];
 const int NPTS = 494;
 float ptx[NPTS], ptz[NPTS];
 float vx[24] = {40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,
@@ -56,29 +62,110 @@ void floor()
 
 }
 
-void stationFloor()
+void station()
 {
-    glColor4f(0,0.7,0,1);
+    glColor4f(0.7,0.7,0.7,1);
+    stationFloor(3);
+    stationFloor(14.9);
+    glBegin(GL_QUADS);
+    //Bottom of the roof
+    for(int i = -50; i < 2; i++)
+    {
+        for(int j = -78;  j < -50; j++)
+        {
+            glVertex3f(i, 12, j);
+            glVertex3f(i, 12, j+1);
+            glVertex3f(i+1, 12, j+1);
+            glVertex3f(i+1, 12, j);
+        }
+    }
+    glEnd();
+    pillar(-12, 3, -76);
+    pillar(0, 3, -52);
+    pillar(0, 3, -64);
+    pillar(0, 3, -76);
+    pillar(-48, 3, -76);
+    pillar(-24, 3, -76);
+    pillar(-36, 3, -76);
+    pillar(-48, 3, -52);
+    pillar(-48, 3, -64);
+    glPushMatrix();
+    glTranslatef(-48, 0, -128);
+    glRotatef(180, 0, 1, 0);
+    stationRoof();
+    glPopMatrix();
+    stationRoof();
+}
+
+void stationRoof() {
+    //https://stackoverflow.com/questions/3898450/create-a-right-angled-triangular-prism-in-opengl
+    glColor4f(0.3,0.3,0.3,1);
+    // back endcap
+    glNormal3f(0, 0, -1);
+    glBegin(GL_TRIANGLES);
+    glVertex3f(2, 14, -78);
+    glVertex3f(-24, 14, -78);
+    glVertex3f(-24, 20, -78);
+    glEnd();
+
+    // front endcap
+    glNormal3f(0, 0, 1);
+    glBegin(GL_TRIANGLES);
+    glVertex3f(2, 14, -50);
+    glVertex3f(-24, 14, -50);
+    glVertex3f(-24, 20, -50);
+    glEnd();
+
+    // bottom
+    glBegin(GL_QUADS);
+    glVertex3f(-24, 14, -78);
+    glVertex3f(2, 14, -78);
+    glVertex3f(2, 14, -50);
+    glVertex3f(-24, 14, -50);
+    glEnd();
+
+    // back
+    glBegin(GL_QUADS);
+    glVertex3f(-24, 14, -78);
+    glVertex3f(-24, 20, -78);
+    glVertex3f(-24, 20, -50);
+    glVertex3f(-24, 14, -50);
+    glEnd();
+
+    glm::vec3 u(-24-2, 20-14, 0);
+    u = glm::normalize(u);
+    glm::vec3 v = {-u[1], u[0], u[2]};
+    // top
+    glBegin(GL_QUADS);
+    glVertex3f(-24, 20, -78);
+    glVertex3f(2, 14, -78);
+    glVertex3f(2, 14, -50);
+    glVertex3f(-24, 20, -50);
+    glEnd();
+}
+
+void stationFloor(int height)
+{
     glNormal3f(0.0, 1.0, 0.0);
     glBegin(GL_QUADS);
     //Station floor
-    for(int i = -50; i < -10; i++)
+    for(int i = -50; i < 2; i++)
     {
-        for(int j = -70;  j < -50; j++)
+        for(int j = -78;  j < -50; j++)
         {
-            glVertex3f(i, 3, j);
-            glVertex3f(i, 3, j+1);
-            glVertex3f(i+1, 3, j+1);
-            glVertex3f(i+1, 3, j);
+            glVertex3f(i, height, j);
+            glVertex3f(i, height, j+1);
+            glVertex3f(i+1, height, j+1);
+            glVertex3f(i+1, height, j);
         }
     }
     glEnd();
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(-1, 0, 0.0);
-    for(int i = 0; i < 3; i++)
+    for(int i = height-3; i < height; i++)
     {
-        for(int j = -70;  j < -50; j++)
+        for(int j = -78;  j < -50; j++)
         {
             glVertex3f(-50, i, j);
             glVertex3f(-50, i, j+1);
@@ -89,22 +176,22 @@ void stationFloor()
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(1, 0, 0.0);
-    for(int i = 0; i < 3; i++)
+    for(int i = height-3; i < height; i++)
     {
-        for(int j = -70;  j < -50; j++)
+        for(int j = -78;  j < -50; j++)
         {
-            glVertex3f(-10, i, j);
-            glVertex3f(-10, i, j+1);
-            glVertex3f(-10, i+1, j+1);
-            glVertex3f(-10, i+1, j);
+            glVertex3f(2, i, j);
+            glVertex3f(2, i, j+1);
+            glVertex3f(2, i+1, j+1);
+            glVertex3f(2, i+1, j);
         }
     }
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(0, 0, 1.0);
-    for(int i = 0; i < 3; i++)
+    for(int i = height-3; i < height; i++)
     {
-        for(int j = -50;  j < -10; j++)
+        for(int j = -50;  j < 2; j++)
         {
             glVertex3f(j, i, -50);
             glVertex3f(j+1, i, -50);
@@ -115,14 +202,14 @@ void stationFloor()
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(0, 0, -1.0);
-    for(int i = 0; i < 3; i++)
+    for(int i = height-3; i < height; i++)
     {
-        for(int j = -50;  j < -10; j++)
+        for(int j = -50;  j < 2; j++)
         {
-            glVertex3f(j, i, -70);
-            glVertex3f(j+1, i, -70);
-            glVertex3f(j+1, i+1, -70);
-            glVertex3f(j, i+1, -70);
+            glVertex3f(j, i, -78);
+            glVertex3f(j+1, i, -78);
+            glVertex3f(j+1, i+1, -78);
+            glVertex3f(j, i+1, -78);
         }
     }
 }
@@ -142,6 +229,72 @@ void loadTracks()
     for (int i = 0; i < NPTS; i++)
         ifile >> ptx[i] >> ptz[i];
     ifile.close();
+}
+
+void loadPillar()
+{
+    for (int i = 0; i < pillarPTS; i++)
+    {
+        pillarx_init[i] /= 3;
+        pillary_init[i] /= 1;
+        glm::vec2 temp(pillarx_init[i]+pillarx_init[i+1],pillary_init[i]+pillary_init[i+1]);
+        temp = glm::normalize(temp);
+        pnormx_init[i] = temp[0];
+        pnormy_init[i] = temp[1];
+    }
+}
+
+void pillar(int x, int y, int z)
+{
+    float toRadians = M_PI / 180.0;   //Conversion from degrees to radians
+    float angStep = 10.0 * toRadians;
+    float px[pillarPTS], py[pillarPTS], pz[pillarPTS];   //vertex positions
+    float qx[pillarPTS], qy[pillarPTS], qz[pillarPTS];
+    float nx[pillarPTS], ny[pillarPTS], nz[pillarPTS];   //normal vectors
+    float mx[pillarPTS], my[pillarPTS], mz[pillarPTS];
+    for (int i = 0; i < pillarPTS; i++)		//Initialize data everytime the frame is refreshed
+    {
+        px[i] = pillarx_init[i];
+        py[i] = pillary_init[i];
+        pz[i] = 0;
+        nx[i] = pnormx_init[i];
+        ny[i] = pnormy_init[i];
+        nz[i] = 0;
+    }
+    for (int j = 0; j <= 36; j++)
+    {
+        for (int i = 0; i < pillarPTS; i++)
+        {
+            qx[i] = cos(angStep) * px[i] + sin(angStep) * pz[i];
+            qy[i] = py[i];
+            qz[i] = -sin(angStep) * px[i] + cos(angStep) * pz[i];
+            mx[i] = cos(angStep) * nx[i] + sin(angStep) * nz[i];
+            my[i] = ny[i];
+            mz[i] = -sin(angStep) * nx[i] + cos(angStep) * nz[i];
+        }
+
+        glBegin(GL_QUAD_STRIP);
+        for (int i = 0; i < pillarPTS; i++)
+        {
+            glNormal3f(nx[i], ny[i], nz[i]);
+            //glTexCoord2f((float)j/36, (float)i/(pillarPTS-1));
+            glVertex3f(px[i]+x, py[i]+y, pz[i]+z);
+            glNormal3f(mx[i], my[i], mz[i]);
+            //glTexCoord2f((float)(j+1)/36, (float)i/(pillarPTS-1));
+            glVertex3f(qx[i]+x, qy[i]+y, qz[i]+z);
+        }
+        glEnd();
+
+        for (int i = 0; i < pillarPTS; i++)    //Update vertices and normals
+        {
+            px[i] = qx[i];
+            py[i] = qy[i];
+            pz[i] = qz[i];
+            nx[i] = mx[i];
+            ny[i] = my[i];
+            nz[i] = mz[i];
+        }
+    }
 }
 
 void tracks()
