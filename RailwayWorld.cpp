@@ -15,6 +15,10 @@
 int r = 0;
 float angle=0, look_x, look_z=-1., eye_x, eye_z, cam_hgt;  //Rotation angle, camera height
 
+void displayEngine();
+
+void displayWagon(int i);
+
 void special(int key, int x, int y)
 {
     if(key == GLUT_KEY_LEFT) angle -= 0.1;  //Change direction
@@ -54,6 +58,7 @@ void initialize(void)
     glEnable(GL_LIGHT1);
     loadTracks();
     loadPillar();
+    loadWheel();
 //	Define light's ambient, diffuse, specular properties
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
@@ -67,7 +72,6 @@ void initialize(void)
     glLightfv(GL_LIGHT1, GL_SPECULAR, white);
     glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 30.0);
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT,0.01);
- 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 	glClearColor (0.0, 0.0, 0.0, 0.0);  //Background colour
@@ -80,54 +84,83 @@ void initialize(void)
 //-------------------------------------------------------------------
 void display(void)
 {
+
    float lgt_pos[] = {0.0f, 50.0f, 0.0f, 1.0f};  //light0 position (directly above the origin)
-   float lgt_pos2[] = {-10, 14, 0, 1};
-   float spot_direction[] = {-1, -1, 0};
+   r %= 492;
    glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
    glMatrixMode(GL_MODELVIEW);
    glLoadIdentity();
-
    gluLookAt (eye_x, cam_hgt, eye_z,  look_x, 0, look_z,   0, 1, 0);
    glLightfv(GL_LIGHT0, GL_POSITION, lgt_pos);   //light position
    floor();
    station();
    tunnel();
    tracks();  //mean radius 120 units, width 10 units
-   glPushMatrix();
-    glm::vec3 u(getPtx(r+1) - getPtx(r), 0, getPtz(r+1) - getPtz(r));
-    u = glm::normalize(u);
-   std::cout << atan2(u[2], -u[0]) << std::endl;
-   glTranslatef(getPtx(r), 0.3, getPtz(r));//locomotive
-    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
-   engine();
-   glLightfv(GL_LIGHT1, GL_POSITION, lgt_pos2);
-   glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
-   glPopMatrix();
-   glPushMatrix();
-   glRotatef(-10.5 + r, 0, 1, 0);
-   glTranslatef(0, 1, -120);
-   wagon();
-   glPopMatrix();
-   glPushMatrix();
-   glRotatef(-21 + r, 0, 1, 0);
-   glTranslatef(0, 1, -120);
-   wagon();
-   glPopMatrix();
-   glPushMatrix();
-   glRotatef(-31.5 + r, 0, 1, 0);
-   glTranslatef(0, 1, -120);
-   wagon();
-   glPopMatrix();
-   glPushMatrix();
-   glRotatef(-42 + r, 0, 1, 0);
-   glTranslatef(0, 1, -120);
-   wagon();
-   glPopMatrix();
+   displayEngine();
+   displayWagon(22);
+    displayWagon(44);
+    displayWagon(66);
+    displayWagon(88);
    glutSwapBuffers();
    r++;
-   r %= 493;
 
            //Useful for animation
+}
+
+void displayWagon(int i) {
+    glm::vec3 u;
+    glPushMatrix();
+    u = {getPtx((r-5-i+492) % 492) - getPtx((r-6-i+492) % 492), 0, getPtz((r-5-i+492) % 492) - getPtz((r-6-i+492) % 492)};
+    u = glm::normalize(u);
+    std::cout << ((r-5-i+492) % 492) << std::endl;
+    glTranslatef(getPtx((r-i+492) % 492), 0.3, getPtz((r-i+492) % 492));//locomotive
+    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
+    base(r, 1);
+    glPopMatrix();
+    glPushMatrix();
+    u = {getPtx((r+6-i+492) % 492) - getPtx((r+5-i+492) % 492), 0, getPtz((r+6-i+492) % 492) - getPtz((r+5-i+492) % 492)};
+    u = glm::normalize(u);
+    glTranslatef(getPtx((r-i+492) % 492), 0.3, getPtz((r-i+492) % 492));//locomotive
+    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
+    base((r) % 492, -1);
+    glPopMatrix();
+    glPushMatrix();
+    u = {getPtx((r+1-i+492) % 492) - getPtx((r-i+492) % 492), 0, getPtz((r+1-i+492) % 492) - getPtz((r-i+492) % 492)};
+    u = glm::normalize(u);
+    glTranslatef(getPtx((r-i+492) % 492), 0.3, getPtz((r-i+492) % 492));//locomotive
+    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
+    wagon(r);
+    glPopMatrix();
+}
+
+
+void displayEngine() {
+    float lgt_pos2[] = {-10, 14, 0, 1};
+    float spot_direction[] = {-1, -1, 0};
+    glm::vec3 u;
+    glPushMatrix();
+    u = {getPtx((r-5 + 492) % 492) - getPtx((r-6+ 492) % 492), 0, getPtz((r-5+ 492) % 492) - getPtz((r-6+ 492) % 492)};
+    u = glm::normalize(u);
+    glTranslatef(getPtx(r), 0.3, getPtz(r));//locomotive
+    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
+    base(r, 1);
+    glPopMatrix();
+    glPushMatrix();
+    u = {getPtx((r+6+ 492) % 492) - getPtx((r+5+ 492) % 492), 0, getPtz((r+6+ 492) % 492) - getPtz((r+5+ 492) % 492)};
+    u = glm::normalize(u);
+    glTranslatef(getPtx(r), 0.3, getPtz(r));//locomotive
+    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
+    base(r, -1);
+    glPopMatrix();
+    glPushMatrix();
+    u = {getPtx((r+1+ 492) % 492) - getPtx(r), 0, getPtz((r+1+ 492) % 492) - getPtz(r)};
+    u = glm::normalize(u);
+    glTranslatef(getPtx(r), 0.3, getPtz(r));//locomotive
+    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
+    engine(r);
+    glLightfv(GL_LIGHT1, GL_POSITION, lgt_pos2);
+    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
+    glPopMatrix();
 }
 
 void myTimer (int value) {
