@@ -8,9 +8,11 @@
 #include <math.h>
 #include <GL/freeglut.h>
 #include <fstream>
+#include <iostream>
 #include "RailModels.h"
+#include <glm/glm.hpp>
 
-float r = 0;
+int r = 0;
 float angle=0, look_x, look_z=-1., eye_x, eye_z, cam_hgt;  //Rotation angle, camera height
 
 void special(int key, int x, int y)
@@ -92,8 +94,11 @@ void display(void)
    tunnel();
    tracks();  //mean radius 120 units, width 10 units
    glPushMatrix();
-   glRotatef(r, 0, 1, 0);
-   glTranslatef(0, 1, -120);//locomotive
+    glm::vec3 u(getPtx(r+1) - getPtx(r), 0, getPtz(r+1) - getPtz(r));
+    u = glm::normalize(u);
+   std::cout << atan2(u[2], -u[0]) << std::endl;
+   glTranslatef(getPtx(r), 0.3, getPtz(r));//locomotive
+    glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
    engine();
    glLightfv(GL_LIGHT1, GL_POSITION, lgt_pos2);
    glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spot_direction);
@@ -120,6 +125,7 @@ void display(void)
    glPopMatrix();
    glutSwapBuffers();
    r++;
+   r %= 493;
 
            //Useful for animation
 }

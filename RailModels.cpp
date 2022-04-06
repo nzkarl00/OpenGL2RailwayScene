@@ -38,6 +38,15 @@ float vz[24] = {30.734,30.875,31.158,31.584,32.188,33.028,34.071,35.175,36.281,3
 // centered at the origin.  This region is constructed using small quads
 // of unit size, to facilitate rendering of spotlights
 //-----------------------------------------------------------------
+
+float getPtx(int i) {
+    return ptx[i];
+}
+
+float getPtz(int i) {
+    return ptz[i];
+}
+
 void floor()
 {
 	float white[4] = {1., 1., 1., 1.};
@@ -301,10 +310,10 @@ void tracks()
 {
 
     float w1 = 3.5; float w2 = 4;
-    glColor4f(0.0, 0.0, 0.3, 1.0);
-    glBegin(GL_QUAD_STRIP);
+    glColor4f(0.3, 0.3, 0.3, 1.0);
     for (int i=0; i < 2; i++) {
-        for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
+        glBegin(GL_QUAD_STRIP);
+        for (int i = 0; i < NPTS-1; i++)    //5 deg intervals
         {
             //std::cout << ptx[i] << std::endl;
             glm::vec3 p(ptx[i], 0, ptz[i]);
@@ -313,10 +322,12 @@ void tracks()
             glm::vec3 v = {u[2], u[1], -u[0]};
             glm::vec3 t1(p + v * w1);
             glm::vec3 t2(p + v * w2);
+            glNormal3f(0,1,0);
             glVertex3f(t1[0], 0.5, t1[2]);
+            glNormal3f(0,1,0);
             glVertex3f(t2[0], 0.5, t2[2]);
         }
-        for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
+        for (int i = 0; i < NPTS-1; i++)    //5 deg intervals
         {
             //std::cout << ptx[i] << std::endl;
             glm::vec3 p(ptx[i], 0, ptz[i]);
@@ -325,10 +336,12 @@ void tracks()
             glm::vec3 v = {u[2], u[1], -u[0]};
             glm::vec3 t1(p + v * w1);
             glm::vec3 t2(p + v * w2);
+            glNormal3f(v[0], v[1], v[2]);
             glVertex3f(t1[0], t1[1], t1[2]);
+            glNormal3f(v[0], v[1], v[2]);
             glVertex3f(t1[0], 0.5, t1[2]);
         }
-        for (int i = 0; i < NPTS - 1; i++)    //5 deg intervals
+        for (int i = 0; i < NPTS-1; i++)    //5 deg intervals
         {
             //std::cout << ptx[i] << std::endl;
             glm::vec3 p(ptx[i], 0, ptz[i]);
@@ -337,13 +350,36 @@ void tracks()
             glm::vec3 v = {u[2], u[1], -u[0]};
             glm::vec3 t1(p + v * w1);
             glm::vec3 t2(p + v * w2);
+            glNormal3f(v[0], v[1], -v[2]);
             glVertex3f(t2[0], t2[1], t2[2]);
+            glNormal3f(v[0], v[1], -v[2]);
             glVertex3f(t2[0], 0.5, t2[2]);
         }
+        glEnd();
         w1 = -w1;
         w2 = -w2;
     }
-	glEnd();
+    float sleeperWidth = 7;
+    glColor4f(0.7, 0.3, 0.3, 1.0);
+    for (int i = 0; i < NPTS-1; i+=3)    //5 deg intervals
+    {
+        glBegin(GL_QUAD_STRIP);
+        //std::cout << ptx[i] << std::endl;
+        glm::vec3 p(ptx[i], 0, ptz[i]);
+        glm::vec3 u(ptx[i + 1] - ptx[i], 0, ptz[i + 1] - ptz[i]);
+        u = glm::normalize(u);
+        glm::vec3 v = {u[2], u[1], -u[0]};
+        glm::vec3 sleeper1(p + v * sleeperWidth);
+        glm::vec3 sleeper2(p - v * sleeperWidth);
+        glNormal3f(0,1,0);
+        glVertex3f(sleeper1[0], 0.1, sleeper1[2]);
+        glVertex3f(sleeper1[0]+u[0], 0.1, sleeper1[2]+u[2]);
+        glNormal3f(0,1,0);
+        glVertex3f(sleeper2[0], 0.1, sleeper2[2]);
+        glVertex3f(sleeper2[0]+u[0], 0.1, sleeper2[2]+u[2]);
+        glEnd();
+    }
+
 }
 
 
@@ -463,18 +499,19 @@ void base()
 
     //4 Wheels (radius = 2 units)
 	//x, z positions of wheels:
-	float wx[4] = {  -8,   8,   -8,    8 }; 
-	float wz[4] = { 5.1, 5.1, -5.1, -5.1 };
+	float wx[8] = {  -8,-8,   8,8,   -8,-8,    8,8 };
+	float wz[8] = { 4.5, 3.5, 4.5, 3.5, -4.5,-3.5, -4.5,-3.5 };
     glColor4f(0.5, 0., 0., 1.0);    //Wheel color
 	GLUquadric *q = gluNewQuadric();   //Disc
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		glPushMatrix();
 		glTranslatef(wx[i], 2.0, wz[i]);
-		gluDisk(q, 0.0, 2.0, 20, 2);
+		gluDisk(q, 0, 2.0, 20, 2);
 		glPopMatrix();
 	}
+
 }
 
 //--------------- LOCOMOTIVE --------------------------------

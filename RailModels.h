@@ -26,3 +26,7 @@ void loadPillar();
 void pillar(int x, int y, int z);
 
 void stationRoof();
+
+float getPtx(int i);
+
+float getPtz(int i);
