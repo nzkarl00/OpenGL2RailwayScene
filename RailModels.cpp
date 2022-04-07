@@ -15,7 +15,9 @@
 #include <glm/gtx/string_cast.hpp>
 #include <iostream>
 #include <fstream>
+#include "loadBMP.h"
 
+GLuint txId;
 const int wheelPTS = 24;
 float wheelx[wheelPTS], wheely[wheelPTS];
 const int pillarPTS = 50;
@@ -365,7 +367,6 @@ void tracks()
     for (int i = 0; i < NPTS-1; i+=3)    //5 deg intervals
     {
         glBegin(GL_QUAD_STRIP);
-        //std::cout << ptx[i] << std::endl;
         glm::vec3 p(ptx[i], 0, ptz[i]);
         glm::vec3 u(ptx[i + 1] - ptx[i], 0, ptz[i + 1] - ptz[i]);
         u = glm::normalize(u);
@@ -669,12 +670,87 @@ glm::vec3 windowNormal(int i) {
 //--------------------------------------------------------
 void wagon(int wheelRotation)
 {
-    glColor4f(0.0, 1.0, 1.0, 1.0);
+    glColor4f(1.0, 1.0, 1.0, 1.0);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId);
     glPushMatrix();
-      glTranslatef(0.0, 10.0, 0.0);
-      glScalef(18.0, 10.0, 10.0);
-      glutSolidCube(1.0);
+    glTranslatef(0,1,0);
+    glScalef(0.25,0.8,0.8);
+    glBegin(GL_QUADS);
+    glNormal3f(0.0, 0.0, 1.0);   //Facing +z (Front side)
+    for (int i=-35; i<35;i++) {
+        for (int j=5; j<17;j++) {
+            glTexCoord2f((float)((i+35)/70), (float)((j-5)/13));
+            std::cout << "x" << std::endl;
+            std::cout << (float)((i+35)/70) << std::endl;
+            std::cout << "y" << std::endl;
+            std::cout << (float)((j-5)/13) << std::endl;
+            glVertex3f(i, j, 6);
+            glTexCoord2f(float((i+35)/70), float((j-4)/13));
+            glVertex3f(i, j+1, 6);
+            glTexCoord2f(float((i+36)/70), float((j-4)/13));
+            glVertex3f(i+1, j+1, 6);
+            glTexCoord2f(float((i+36)/70), float((j-5)/13));
+            glVertex3f(i+1, j, 6);
+        }
+    }
+
+    glNormal3f(0.0, 0.0, -1.0);   //Facing -z (Back side)
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(35.0, 5.0, -6.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(-35.0, 5.0,-6.0);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(-35.0, 17.0,-6.0);
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(35.0, 17.0, -6.0);
+
+    glNormal3f(0.0, 1.0, 0.0);   //Facing +y (Top side)
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-35.0, 17.0, 6.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(35.0, 17.0,  6.0);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(35.0, 17.0, -6.0);
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(-35.0, 17.0, -6.0);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId);
+    glBegin(GL_QUADS);
+    glNormal3f(-1.0, 0.0, 0.0);//Facing -x (Left side)
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-35.0, 5.0, -6.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(-35.0, 5.0, 6.0);
+    glTexCoord2f(1.0, 0.2);
+    glVertex3f(-35.0, 17.0, 6.0);
+    glTexCoord2f(0.0, 0.2);
+    glVertex3f(-35.0, 17.0, -6.0);
+
+    glNormal3f(1.0, 0.0, 0.0);   //Facing +x (Right side)
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(35.0, 5.0, 6.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(35.0, 5.0, -6.0);
+    glTexCoord2f(1.0, 0.2);
+    glVertex3f(35.0, 17.0, -6.0);
+    glTexCoord2f(0.0, 0.2);
+    glVertex3f(35.0, 17.0, 6.0);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
     glPopMatrix();
+}
+
+void loadTexture()
+{
+    glGenTextures(1, &txId); 				// Create a Texture object
+    glBindTexture(GL_TEXTURE_2D, txId);		//Use this texture
+    loadBMP("container.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	//Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
 #pragma clang diagnostic pop

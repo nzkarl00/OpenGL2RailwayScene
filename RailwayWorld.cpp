@@ -12,6 +12,7 @@
 #include "RailModels.h"
 #include <glm/glm.hpp>
 
+int e = 0;
 int r = 0;
 float angle=0, look_x, look_z=-1., eye_x, eye_z, cam_hgt;  //Rotation angle, camera height
 
@@ -59,6 +60,7 @@ void initialize(void)
     loadTracks();
     loadPillar();
     loadWheel();
+    loadTexture();
 //	Define light's ambient, diffuse, specular properties
     glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
     glEnable(GL_COLOR_MATERIAL);
@@ -102,7 +104,7 @@ void display(void)
     displayWagon(66);
     displayWagon(88);
    glutSwapBuffers();
-   r++;
+
 
            //Useful for animation
 }
@@ -112,7 +114,6 @@ void displayWagon(int i) {
     glPushMatrix();
     u = {getPtx((r-5-i+492) % 492) - getPtx((r-6-i+492) % 492), 0, getPtz((r-5-i+492) % 492) - getPtz((r-6-i+492) % 492)};
     u = glm::normalize(u);
-    std::cout << ((r-5-i+492) % 492) << std::endl;
     glTranslatef(getPtx((r-i+492) % 492), 0.3, getPtz((r-i+492) % 492));//locomotive
     glRotatef(180*(atan2(u[2], -u[0])/M_PI), 0, 1, 0);
     base(r, 1);
@@ -167,6 +168,28 @@ void myTimer (int value) {
     glutPostRedisplay();
     value++;
     glutTimerFunc(50, myTimer, value);
+    e++;
+    e%=380;
+    if (r==63) {
+        e=0;
+    }
+    if (e > 314) {
+        return;
+    } else if (r%492<20 || r%492 > 490) {
+        r += 1;
+    } else if (r%492<40 || r%492 > 480) {
+        r += 1.2;
+    } else if (r%492<60 || r%492 > 470) {
+        r += 1.4;
+    } else if (r%492<80 || r%492 > 460) {
+        r += 1.6;
+        return;
+    } else if (r%492<100 || r%492 > 450) {
+        r += 1.8;
+    } else {
+        r += 2;
+    }
+
 }
 
 //---------------------------------------------------------------------

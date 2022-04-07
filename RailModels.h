@@ -50,3 +50,5 @@ void trackSide2(int i, float w1, float w2);
 void window();
 
 glm::vec3 windowNormal(int i);
+
+void loadTexture();
