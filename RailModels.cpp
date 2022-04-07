@@ -17,7 +17,7 @@
 #include <fstream>
 #include "loadBMP.h"
 
-GLuint txId;
+GLuint txId[3];
 const int wheelPTS = 24;
 float wheelx[wheelPTS], wheely[wheelPTS];
 const int pillarPTS = 50;
@@ -29,7 +29,7 @@ float pillary_init[pillarPTS] = { 0, 0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.
                      7.8, 8, 8.2, 8.4, 8.6, 8.8, 9, 9, 9, 9 };
 float pnormx_init[pillarPTS];
 float pnormy_init[pillarPTS];
-const int NPTS = 492;
+const int NPTS = 617;
 float ptx[NPTS], ptz[NPTS];
 float vx[24] = {40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,
 24,23,22,21,20,19,18,17};
@@ -91,22 +91,25 @@ void floor()
 
 void station()
 {
-    glColor4f(0.7,0.7,0.7,1);
+    glColor4f(0.3,0.3,0.3,1);
     stationFloor(3);
-    stationFloor(14.9);
+    stationFloor(21.9);
     glBegin(GL_QUADS);
     //Bottom of the roof
     for(int i = -50; i < 2; i++)
     {
         for(int j = -78;  j < -50; j++)
         {
-            glVertex3f(i, 12, j);
-            glVertex3f(i, 12, j+1);
-            glVertex3f(i+1, 12, j+1);
-            glVertex3f(i+1, 12, j);
+            glVertex3f(i, 18.9, j);
+            glVertex3f(i, 18.9, j+1);
+            glVertex3f(i+1, 18.9, j+1);
+            glVertex3f(i+1, 18.9, j);
         }
     }
     glEnd();
+    glPushMatrix();
+    glTranslatef(0,-2.5,0);
+    glScalef(1,1.75,1);
     pillar(-12, 3, -76);
     pillar(0, 3, -52);
     pillar(0, 3, -64);
@@ -116,8 +119,9 @@ void station()
     pillar(-36, 3, -76);
     pillar(-48, 3, -52);
     pillar(-48, 3, -64);
+    glPopMatrix();
     glPushMatrix();
-    glTranslatef(0, 1, 0);
+    glTranslatef(0, 8, 0);
     glPushMatrix();
     glTranslatef(-48, 0, -128);
     glRotatef(180, 0, 1, 0);
@@ -125,6 +129,38 @@ void station()
     glPopMatrix();
     stationRoof();
     glPopMatrix();
+}
+
+void stationClock(int angle) {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[2]);
+    glBegin(GL_TRIANGLE_FAN);
+    glColor4f(0.7, 0.7, 0.7, 1);
+    glNormal3f(0, 0, 1);
+    glTexCoord2f(0.5, 0.5);
+    glVertex3f(-24, 25, -50);
+    for (int n = 0; n <= 20; ++n) {
+        float const t = 2 * M_PI * (float) n / (float) 20;
+        glTexCoord2f(sin(t) * 0.5 + 0.5, cos(t) * 0.5 + 0.5);
+        glVertex3f(-24 + sin(t) * 5, 25 + cos(t) * 5, -49.9);
+    }
+    glEnd();
+    glColor4f(0,0,0,1);
+    glPushMatrix();
+    glTranslatef(-24, 25, -49.9);
+    glRotatef(-angle%360, 0, 0, 1);
+    glTranslatef(0,2,0);
+    glScalef(0.2, 4, 0.4);
+    glutSolidCube(1);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslatef(-24, 25, -49.9);
+    glRotatef((-angle/12)%360, 0, 0, 1);
+    glTranslatef(0,1,0);
+    glScalef(0.2, 2, 0.4);
+    glutSolidCube(1);
+    glPopMatrix();
+    glDisable(GL_TEXTURE_2D);
 }
 
 void stationRoof() {
@@ -291,6 +327,9 @@ void pillar(int x, int y, int z)
     float qx[pillarPTS], qy[pillarPTS], qz[pillarPTS];
     float nx[pillarPTS], ny[pillarPTS], nz[pillarPTS];   //normal vectors
     float mx[pillarPTS], my[pillarPTS], mz[pillarPTS];
+    glColor4f(0.8,0.8,0.8,1);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[1]);
     for (int i = 0; i < pillarPTS; i++)		//Initialize data everytime the frame is refreshed
     {
         px[i] = pillarx_init[i];
@@ -316,10 +355,10 @@ void pillar(int x, int y, int z)
         for (int i = 0; i < pillarPTS; i++)
         {
             glNormal3f(nx[i], ny[i], nz[i]);
-            //glTexCoord2f((float)j/36, (float)i/(pillarPTS-1));
+            glTexCoord2f((float)j/36, (float)i/((pillarPTS-1)/8));
             glVertex3f(px[i]+x, py[i]+y, pz[i]+z);
             glNormal3f(mx[i], my[i], mz[i]);
-            //glTexCoord2f((float)(j+1)/36, (float)i/(pillarPTS-1));
+            glTexCoord2f((float)(j+1)/36, (float)i/((pillarPTS-1)/8));
             glVertex3f(qx[i]+x, qy[i]+y, qz[i]+z);
         }
         glEnd();
@@ -334,6 +373,7 @@ void pillar(int x, int y, int z)
             nz[i] = mz[i];
         }
     }
+    glDisable(GL_TEXTURE_2D);
 }
 
 void tracks()
@@ -425,6 +465,9 @@ void trackTop(int i, float w1, float w2) {
 
 
 void tunnel() {
+    glPushMatrix();
+    glScalef(1.5, 1.5, 1.5);
+    glTranslatef(0,0,-13);
     glColor4f(0.0, 0.0, 0.3, 1.0);
     glBegin(GL_QUAD_STRIP);
     //Archway back cover
@@ -516,7 +559,7 @@ void tunnel() {
         glVertex3f(39-slice, 0, ((vz[23]-40)*.9)+40);
         glEnd();
     };
-
+    glPopMatrix();
 }
 
 //--------------- MODEL BASE --------------------------------------
@@ -544,7 +587,7 @@ void base(int wheelRotation, int toggle)
     //4 Wheels (radius = 2 units)
 	//x, z positions of wheels:
 	float wx[8] = {  8,8,4,4,8,8,4,4 };
-	float wz[8] = { 4.1, 3.4, 4.1, 3.4, -4.1,-3.4, -4.1,-3.4 };//Wheel color
+	float wz[8] = { 4.1, 3.4, 4.1, 3.4, -4.4,-3.7, -4.4,-3.7 };//Wheel color
 	GLUquadric *q = gluNewQuadric();   //Disc
 	for (int i = 0; i < 8; i++)
 	{
@@ -672,7 +715,7 @@ void wagon(int wheelRotation)
 {
     glColor4f(1.0, 1.0, 1.0, 1.0);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, txId);
+    glBindTexture(GL_TEXTURE_2D, txId[0]);
     glPushMatrix();
     glTranslatef(0,1,0);
     glScalef(0.25,0.8,0.8);
@@ -680,64 +723,76 @@ void wagon(int wheelRotation)
     glNormal3f(0.0, 0.0, 1.0);   //Facing +z (Front side)
     for (int i=-35; i<35;i++) {
         for (int j=5; j<17;j++) {
-            glTexCoord2f((float)((i+35)/70), (float)((j-5)/13));
-            std::cout << "x" << std::endl;
-            std::cout << (float)((i+35)/70) << std::endl;
-            std::cout << "y" << std::endl;
-            std::cout << (float)((j-5)/13) << std::endl;
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-5)/13));
             glVertex3f(i, j, 6);
-            glTexCoord2f(float((i+35)/70), float((j-4)/13));
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-4)/13));
             glVertex3f(i, j+1, 6);
-            glTexCoord2f(float((i+36)/70), float((j-4)/13));
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-4)/13));
             glVertex3f(i+1, j+1, 6);
-            glTexCoord2f(float((i+36)/70), float((j-5)/13));
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-5)/13));
             glVertex3f(i+1, j, 6);
         }
     }
+    glNormal3f(0.0, 0.0, -1.0); //Facing -z (Back side)
+    for (int i=-35; i<35;i++) {
+        for (int j=5; j<17;j++) {
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-5)/13));
+            glVertex3f(i, j, -6);
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-4)/13));
+            glVertex3f(i, j+1, -6);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-4)/13));
+            glVertex3f(i+1, j+1, -6);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-5)/13));
+            glVertex3f(i+1, j, -6);
+        }
+    }
 
-    glNormal3f(0.0, 0.0, -1.0);   //Facing -z (Back side)
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(35.0, 5.0, -6.0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(-35.0, 5.0,-6.0);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(-35.0, 17.0,-6.0);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(35.0, 17.0, -6.0);
+
 
     glNormal3f(0.0, 1.0, 0.0);   //Facing +y (Top side)
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-35.0, 17.0, 6.0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(35.0, 17.0,  6.0);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(35.0, 17.0, -6.0);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(-35.0, 17.0, -6.0);
+    for (int i=-35; i<35;i++) {
+        for (int j=-6; j<6;j++) {
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-5)/13));
+            glVertex3f(i, 17, j);
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-4)/13));
+            glVertex3f(i, 17, j+1);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-4)/13));
+            glVertex3f(i+1, 17, j+1);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-5)/13));
+            glVertex3f(i+1, 17, j);
+        }
+    }
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, txId);
+    glBindTexture(GL_TEXTURE_2D, txId[0]);
     glBegin(GL_QUADS);
     glNormal3f(-1.0, 0.0, 0.0);//Facing -x (Left side)
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-35.0, 5.0, -6.0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(-35.0, 5.0, 6.0);
-    glTexCoord2f(1.0, 0.2);
-    glVertex3f(-35.0, 17.0, 6.0);
-    glTexCoord2f(0.0, 0.2);
-    glVertex3f(-35.0, 17.0, -6.0);
-
+    for (int i=5; i<17;i++) {
+        for (int j=-6; j<6;j++) {
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-5)/13));
+            glVertex3f(-35, i, j);
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-4)/13));
+            glVertex3f(-35, i, j+1);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-4)/13));
+            glVertex3f(-35, i+1, j+1);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-5)/13));
+            glVertex3f(-35, i+1, j);
+        }
+    }
     glNormal3f(1.0, 0.0, 0.0);   //Facing +x (Right side)
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(35.0, 5.0, 6.0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(35.0, 5.0, -6.0);
-    glTexCoord2f(1.0, 0.2);
-    glVertex3f(35.0, 17.0, -6.0);
-    glTexCoord2f(0.0, 0.2);
-    glVertex3f(35.0, 17.0, 6.0);
+    for (int i=5; i<17;i++) {
+        for (int j=-6; j<6;j++) {
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-5)/13));
+            glVertex3f(35, i, j);
+            glTexCoord2f(((float)(i+35)/70), ((float)(j-4)/13));
+            glVertex3f(35, i, j+1);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-4)/13));
+            glVertex3f(35, i+1, j+1);
+            glTexCoord2f(((float)(i+36)/70), ((float)(j-5)/13));
+            glVertex3f(35, i+1, j);
+        }
+    }
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glPopMatrix();
@@ -745,9 +800,18 @@ void wagon(int wheelRotation)
 
 void loadTexture()
 {
-    glGenTextures(1, &txId); 				// Create a Texture object
-    glBindTexture(GL_TEXTURE_2D, txId);		//Use this texture
+    glGenTextures(3, txId); 				// Create a Texture object
+    	//Use this texture
+    glBindTexture(GL_TEXTURE_2D, txId[0]);
     loadBMP("container.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	//Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, txId[1]);
+    loadBMP("pillar.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	//Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, txId[2]);
+    loadBMP("clock.bmp");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	//Set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);

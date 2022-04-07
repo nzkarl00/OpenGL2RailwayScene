@@ -52,3 +52,5 @@ void window();
 glm::vec3 windowNormal(int i);
 
 void loadTexture();
+
+void stationClock(int angle);
