@@ -148,6 +148,7 @@ void display(void)
 
    glLightfv(GL_LIGHT0, GL_POSITION, lgt_pos);   //light position
    floor();
+    skybox();
    station();
     stationClock(c);
    tunnel();

@@ -47,8 +47,14 @@ void loadBMP(string filename)
 	{
 	    indx = i*nbytes;
 	    temp = imageData[indx];
-	    imageData[indx] = imageData[indx+1];
-	    imageData[indx+1] = temp;
+        if (filename == "F1.bmp" || filename == "B1.bmp" || filename == "R1.bmp" || filename == "L1.bmp" || filename == "U1.bmp") {
+            imageData[indx] = imageData[indx+2];
+            imageData[indx+2] = temp;
+        } else {
+            imageData[indx] = imageData[indx+1];
+            imageData[indx+1] = temp;
+        }
+
     }
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, wid, hgt, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
     delete imageData;	

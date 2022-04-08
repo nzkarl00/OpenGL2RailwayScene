@@ -54,3 +54,7 @@ glm::vec3 windowNormal(int i);
 void loadTexture();
 
 void stationClock(int angle);
+
+glm::vec3 tunnelNormal(int i);
+
+void skybox();

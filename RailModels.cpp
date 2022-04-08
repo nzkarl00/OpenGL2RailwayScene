@@ -6,7 +6,6 @@
 //  RailModels.cpp
 //  A collection of functions for generating the models for a railway scene
 //  ========================================================================
-
 #include <cmath>
 #include <GL/freeglut.h>
 #include "RailModels.h"
@@ -16,8 +15,7 @@
 #include <iostream>
 #include <fstream>
 #include "loadBMP.h"
-
-GLuint txId[3];
+GLuint txId[10];
 const int wheelPTS = 24;
 float wheelx[wheelPTS], wheely[wheelPTS];
 const int pillarPTS = 50;
@@ -167,20 +165,32 @@ void stationRoof() {
     //https://stackoverflow.com/questions/3898450/create-a-right-angled-triangular-prism-in-opengl
     glColor4f(0.3,0.3,0.3,1);
     // back endcap
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     glNormal3f(0, 0, -1);
     glBegin(GL_TRIANGLES);
+    glTexCoord2f(0,0);
     glVertex3f(2, 14, -78);
+    glTexCoord2f(0,0.33);
     glVertex3f(-24, 14, -78);
+    glTexCoord2f(0.1,0.33);
     glVertex3f(-24, 20, -78);
     glEnd();
+    glDisable(GL_TEXTURE_2D);
 
     // front endcap
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     glNormal3f(0, 0, 1);
     glBegin(GL_TRIANGLES);
+    glTexCoord2f(0,0);
     glVertex3f(2, 14, -50);
+    glTexCoord2f(0,0.3);
     glVertex3f(-24, 14, -50);
+    glTexCoord2f(0.1,0.3);
     glVertex3f(-24, 20, -50);
     glEnd();
+    glDisable(GL_TEXTURE_2D);
 
     // bottom
     glBegin(GL_QUADS);
@@ -201,17 +211,38 @@ void stationRoof() {
     glm::vec3 u(-24-2, 20-14, 0);
     u = glm::normalize(u);
     glm::vec3 v = {-u[1], u[0], u[2]};
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     // top
     glBegin(GL_QUADS);
-    glVertex3f(-24, 20, -78);
-    glVertex3f(2, 14, -78);
-    glVertex3f(2, 14, -50);
-    glVertex3f(-24, 20, -50);
+    glColor4f(1,1,1,1);
+    glNormal3f(v[0], v[1], v[2]);
+    for(int i = -24; i < 2; i++)
+    {
+        glm::vec3 u(1, 20-((((float)i+24)/26)*6)-20-((((float)i+25)/26)*6), 1);
+        u = glm::normalize(u);
+        glm::vec3 v = {-u[1], u[0], u[2]};
+        glNormal3f(v[0], v[1], v[2]);
+        for(int j = -78;  j < -50; j++)
+        {
+            glTexCoord2f(((float)(i+23)/78), ((float)(j+79)/90));
+            glVertex3f(i, 20-((((float)i+24)/26)*6), j);
+            glTexCoord2f(((float)(i+23)/78), ((float)(j+80)/90));
+            glVertex3f(i, 20-((((float)i+24)/26)*6), j+1);
+            glTexCoord2f(((float)(i+24)/78), ((float)(j+80)/90));
+            glVertex3f(i+1, 20-((((float)i+25)/26)*6), j+1);
+            glTexCoord2f(((float)(i+24)/78), ((float)(j+79)/90));
+            glVertex3f(i+1, 20-((((float)i+25)/26)*6), j);
+        }
+    }
     glEnd();
+    glDisable(GL_TEXTURE_2D);
 }
 
 void stationFloor(float height)
 {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     glNormal3f(0.0, 1.0, 0.0);
     glBegin(GL_QUADS);
     //Station floor
@@ -219,13 +250,20 @@ void stationFloor(float height)
     {
         for(int j = -78;  j < -50; j++)
         {
+            glTexCoord2f(((float)(i+50)/200), ((float)(j+79)/90));
             glVertex3f(i, height, j);
+            glTexCoord2f(((float)(i+50)/200), ((float)(j+80)/90));
             glVertex3f(i, height, j+1);
+            glTexCoord2f(((float)(i+51)/200), ((float)(j+80)/90));
             glVertex3f(i+1, height, j+1);
+            glTexCoord2f(((float)(i+51)/200), ((float)(j+79)/90));
             glVertex3f(i+1, height, j);
         }
     }
     glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(-1, 0, 0.0);
@@ -233,12 +271,19 @@ void stationFloor(float height)
     {
         for(int j = -78;  j < -50; j++)
         {
+            glTexCoord2f(((float)(i+3)/10), ((float)(j+79)/90));
             glVertex3f(-50, i, j);
+            glTexCoord2f(((float)(i+3)/10), ((float)(j+80)/90));
             glVertex3f(-50, i, j+1);
+            glTexCoord2f(((float)(i+4)/10), ((float)(j+80)/90));
             glVertex3f(-50, i+1, j+1);
+            glTexCoord2f(((float)(i+4)/10), ((float)(j+79)/90));
             glVertex3f(-50, i+1, j);
         }
     }
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(1, 0, 0.0);
@@ -246,12 +291,19 @@ void stationFloor(float height)
     {
         for(int j = -78;  j < -50; j++)
         {
+            glTexCoord2f(((float)(i+3)/9), ((float)(j+79)/90));
             glVertex3f(2, i, j);
+            glTexCoord2f(((float)(i+3)/9), ((float)(j+80)/90));
             glVertex3f(2, i, j+1);
+            glTexCoord2f(((float)(i+4)/9), ((float)(j+80)/90));
             glVertex3f(2, i+1, j+1);
+            glTexCoord2f(((float)(i+4)/9), ((float)(j+79)/90));
             glVertex3f(2, i+1, j);
         }
     }
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(0, 0, 1.0);
@@ -259,12 +311,19 @@ void stationFloor(float height)
     {
         for(int j = -50;  j < 2; j++)
         {
+            glTexCoord2f(((float)(i+3)/9), ((float)(j+50)/200));
             glVertex3f(j, i, -50);
+            glTexCoord2f(((float)(i+3)/9), ((float)(j+51)/200));
             glVertex3f(j+1, i, -50);
+            glTexCoord2f(((float)(i+4)/9), ((float)(j+51)/200));
             glVertex3f(j+1, i+1, -50);
+            glTexCoord2f(((float)(i+4)/9), ((float)(j+50)/200));
             glVertex3f(j, i+1, -50);
         }
     }
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
     glBegin(GL_QUADS);
     //Station floor side
     glNormal3f(0, 0, -1.0);
@@ -272,12 +331,17 @@ void stationFloor(float height)
     {
         for(int j = -50;  j < 2; j++)
         {
+            glTexCoord2f(((float)(i+3)/9), ((float)(j+50)/200));
             glVertex3f(j, i, -78);
+            glTexCoord2f(((float)(i+3)/9), ((float)(j+51)/200));
             glVertex3f(j+1, i, -78);
+            glTexCoord2f(((float)(i+4)/9), ((float)(j+51)/200));
             glVertex3f(j+1, i+1, -78);
+            glTexCoord2f(((float)(i+4)/9), ((float)(j+50)/200));
             glVertex3f(j, i+1, -78);
         }
     }
+    glDisable(GL_TEXTURE_2D);
 }
 
 
@@ -466,9 +530,9 @@ void trackTop(int i, float w1, float w2) {
 
 void tunnel() {
     glPushMatrix();
+    glColor4f(0.5,0.5,0.5,1);
     glScalef(1.5, 1.5, 1.5);
     glTranslatef(0,0,-13);
-    glColor4f(0.0, 0.0, 0.3, 1.0);
     glBegin(GL_QUAD_STRIP);
     //Archway back cover
     for (int i = 0; i < 24; i++)
@@ -514,52 +578,113 @@ void tunnel() {
     glVertex3f(8, 0, vz[23]);
     glEnd();
     for (int slice = 0; slice < 32; slice++) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, txId[4]);
         glBegin(GL_QUAD_STRIP);
         //Outer arch
         for (int i = 0; i < 24; i++)
         {
+            glm::vec3 norm = tunnelNormal(i);
+            if (i == 0) {
+                glNormal3f(0,0,-1);
+            } else {
+                glNormal3f(-norm[0], -norm[1], -norm[2]);
+            }
+            glTexCoord2f(((float)(slice))/8, ((float)i)/5);
             glVertex3f(40-slice, vy[i]/2 + 10, vz[i]);
+            glTexCoord2f(((float)(slice+1))/8, ((float)i)/5);
             glVertex3f(39-slice, vy[i]/2 + 10, vz[i]);
         }
         glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, txId[4]);
         glBegin(GL_QUAD_STRIP);
         //Inner arch
         for (int i = 0; i < 24; i++)
         {
+            glm::vec3 norm = tunnelNormal(i);
+            if (i == 0) {
+                glNormal3f(0,0,1);
+            } else {
+                glNormal3f(norm[0], norm[1], norm[2]);
+            }
+            glTexCoord2f(((float)(slice))/8, ((float)i)/5);
             glVertex3f(40-slice, (vy[i]/2 + 10)*.9, ((vz[i]-40)*.9)+40);
+            glTexCoord2f(((float)(slice+1))/8, ((float)i)/5);
             glVertex3f(39-slice, (vy[i]/2 + 10)*.9, ((vz[i]-40)*.9)+40);
         }
         glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, txId[4]);
         glBegin(GL_QUAD_STRIP);
         //Near pillar inner
+        glNormal3f(0,0,1);
+        glTexCoord2f(((float)(slice))/8, 1);
         glVertex3f(40-slice, (vy[0]/2 + 10)*.9, ((vz[0]-40)*.9)+40);
+        glTexCoord2f(((float)(slice+1))/8, 1);
         glVertex3f(39-slice, (vy[0]/2 + 10)*.9, ((vz[0]-40)*.9)+40);
+        glTexCoord2f(((float)(slice))/8, 0);
         glVertex3f(40-slice, 0, ((vz[0]-40)*.9)+40);
+        glTexCoord2f(((float)(slice+1))/8, 0);
         glVertex3f(39-slice, 0, ((vz[0]-40)*.9)+40);
         glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, txId[4]);
         glBegin(GL_QUAD_STRIP);
         //Near pillar outer
+        glNormal3f(0,0,-1);
+        glTexCoord2f(((float)(slice))/8, 1);
         glVertex3f(40-slice, vy[0]/2 + 10, vz[0]);
+        glTexCoord2f(((float)(slice+1))/8, 1);
         glVertex3f(39-slice, vy[0]/2 + 10, vz[0]);
+        glTexCoord2f(((float)(slice))/8, 0);
         glVertex3f(40-slice, 0, vz[0]);
+        glTexCoord2f(((float)(slice+1))/8, 0);
         glVertex3f(39-slice, 0, vz[0]);
         glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, txId[4]);
         glBegin(GL_QUAD_STRIP);
         //Far pillar outer
+        glNormal3f(0,0,-1);
+        glTexCoord2f(((float)(slice))/8, 1);
         glVertex3f(40-slice, vy[23]/2 + 10, vz[23]);
+        glTexCoord2f(((float)(slice+1))/8, 1);
         glVertex3f(39-slice, vy[23]/2 + 10, vz[23]);
+        glTexCoord2f(((float)(slice))/8, 0);
         glVertex3f(40-slice, 0, vz[23]);
+        glTexCoord2f(((float)(slice+1))/8, 0);
         glVertex3f(39-slice, 0, vz[23]);
         glEnd();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, txId[4]);
         glBegin(GL_QUAD_STRIP);
         //Far pillar inner
+        glNormal3f(0,0,1);
+        glTexCoord2f(((float)(slice))/8, 1);
         glVertex3f(40-slice, (vy[23]/2 + 10)*.9, ((vz[23]-40)*.9)+40);
+        glTexCoord2f(((float)(slice+1))/8, 1);
         glVertex3f(39-slice, (vy[23]/2 + 10)*.9, ((vz[23]-40)*.9)+40);
+        glTexCoord2f(((float)(slice))/8, 0);
         glVertex3f(40-slice, 0, ((vz[23]-40)*.9)+40);
+        glTexCoord2f(((float)(slice+1))/8, 0);
         glVertex3f(39-slice, 0, ((vz[23]-40)*.9)+40);
         glEnd();
+        glDisable(GL_TEXTURE_2D);
     };
     glPopMatrix();
+}
+
+glm::vec3 tunnelNormal(int i) {
+    glm::vec3 v1(0, vy[i + 1] - vy[i], vz[i + 1] - vz[i]);
+    glm::vec3 v2(0, vy[i - 1] - vy[i], vz[i - 1] - vz[i]);
+    glm::vec3 cprod = glm::cross(v1, v2);
+    return glm::normalize(cprod);
 }
 
 //--------------- MODEL BASE --------------------------------------
@@ -798,9 +923,70 @@ void wagon(int wheelRotation)
     glPopMatrix();
 }
 
+void skybox()
+{
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[8]);
+    glBegin(GL_QUADS);
+    glNormal3f(-1, 0, 0);
+    glTexCoord2f(0,0);
+    glVertex3f(300, 0, -300);
+    glTexCoord2f(1,0);
+    glVertex3f(300, 0, 300);
+    glTexCoord2f(1,1);
+    glVertex3f(300, 300, 300);
+    glTexCoord2f(0,1);
+    glVertex3f(300, 300, -300);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[7]);
+    glBegin(GL_QUADS);
+    glNormal3f(1, 0, 0);
+    glTexCoord2f(1,0);
+    glVertex3f(-300, 0, -300);
+    glTexCoord2f(0,0);
+    glVertex3f(-300, 0, 300);
+    glTexCoord2f(0,1);
+    glVertex3f(-300, 300, 300);
+    glTexCoord2f(1,1);
+    glVertex3f(-300, 300, -300);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[5]);
+    glBegin(GL_QUADS);
+    glNormal3f(0, 0, 1);
+    glTexCoord2f(0,0);
+    glVertex3f(-300, 0, -300);
+    glTexCoord2f(1,0);
+    glVertex3f(300, 0, -300);
+    glTexCoord2f(1,1);
+    glVertex3f(300, 300, -300);
+    glTexCoord2f(0,1);
+    glVertex3f(-300, 300, -300);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, txId[6]);
+    glBegin(GL_QUADS);
+    glNormal3f(0, 0, -1);
+    glTexCoord2f(1,0);
+    glVertex3f(-300, 0, 300);
+    glTexCoord2f(0,0);
+    glVertex3f(300, 0, 300);
+    glTexCoord2f(0,1);
+    glVertex3f(300, 300, 300);
+    glTexCoord2f(1,1);
+    glVertex3f(-300, 300, 300);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+}
+
 void loadTexture()
 {
-    glGenTextures(3, txId); 				// Create a Texture object
+
+    glGenTextures(10, txId); 				// Create a Texture object
     	//Use this texture
     glBindTexture(GL_TEXTURE_2D, txId[0]);
     loadBMP("container.bmp");
@@ -814,6 +1000,44 @@ void loadTexture()
     loadBMP("clock.bmp");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	//Set texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, txId[3]);
+    loadBMP("concrete.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	//Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, txId[4]);
+    loadBMP("tunnel.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	//Set texture parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, txId[5]);
+    loadBMP("B1.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, txId[6]);
+    loadBMP("F1.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, txId[7]);
+    loadBMP("L1.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, txId[8]);
+    loadBMP("R1.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, txId[9]);
+    loadBMP("U1.bmp");
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
